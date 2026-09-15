@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { STOREFRONT_ROUTES } from '../lib/products';
 
 const STORE_NAME = "Centaur's Apothecary & Supply Co.";
+const STORE_LOGO = 'https://cdn.marblism.com/ThSwKBBlbmC.png';
 
 // Shop links are derived from the shared storefront route registry
 // (STOREFRONT_ROUTES) rather than hard-coded, so a footer target can never
@@ -34,10 +35,13 @@ export default function SiteFooter() {
 
         {/* Brand */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col leading-none">
-            <span className="text-xs tracking-[0.3em] font-mono uppercase text-zinc-600">
-              [ QP ]
-            </span>
+          <div className="flex items-center gap-3 leading-none">
+            <img
+              src={STORE_LOGO}
+              alt=""
+              aria-hidden="true"
+              className="h-12 w-12 object-contain"
+            />
             <span className="text-sm font-black tracking-tight uppercase text-white">
               {STORE_NAME}
             </span>

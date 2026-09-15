@@ -12,6 +12,7 @@ const NAV_LINKS = [
 ];
 
 const STORE_NAME = "Centaur's Apothecary & Supply Co.";
+const STORE_LOGO = 'https://cdn.marblism.com/ThSwKBBlbmC.png';
 
 export default function SiteHeader() {
   const pathname = usePathname();
@@ -25,12 +26,15 @@ export default function SiteHeader() {
         {/* Wordmark */}
         <Link
           href="/"
-          className="flex flex-col leading-none group"
+          className="flex items-center gap-3 leading-none group"
           aria-label={`${STORE_NAME} — home`}
         >
-          <span className="text-xs tracking-[0.3em] font-mono uppercase text-[#4169E1] group-hover:text-[#6384e8] transition-colors">
-            [ QP ]
-          </span>
+          <img
+            src={STORE_LOGO}
+            alt=""
+            aria-hidden="true"
+            className="h-9 w-9 object-contain"
+          />
           <span className="text-sm font-black tracking-tight uppercase text-white group-hover:text-zinc-200 transition-colors">
             {STORE_NAME}
           </span>
