@@ -1,8 +1,14 @@
 import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
+import { drizzle as drizzleNodePg } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 import * as schema from './schema';
 
-let dbInstance: ReturnType<typeof drizzle<typeof schema>> | null = null;
+// Production remains on Neon HTTP. The node-postgres path is intentionally
+// limited to local Postgres URLs so sandbox verification cannot alter the
+// production database adapter.
+let dbInstance: ReturnType<typeof drizzleNeon<typeof schema>> | ReturnType<typeof drizzleNodePg<typeof schema>> | null = null;
+let localPool: Pool | null = null;
 
 export function getDb() {
   if (!dbInstance) {
@@ -10,7 +16,21 @@ export function getDb() {
     if (!url) {
       throw new Error('CRITICAL: DATABASE_URL is missing or empty during runtime execution.');
     }
-    dbInstance = drizzle(neon(url), { schema });
+
+    if (url.startsWith('postgres://localhost') || url.startsWith('postgresql://localhost')) {
+      localPool = new Pool({ connectionString: url });
+      dbInstance = drizzleNodePg(localPool, { schema });
+    } else {
+      dbInstance = drizzleNeon(neon(url), { schema });
+    }
   }
   return dbInstance;
+}
+
+export async function closeDb() {
+  if (localPool) {
+    await localPool.end();
+    localPool = null;
+  }
+  dbInstance = null;
 }
