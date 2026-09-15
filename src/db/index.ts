@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 import * as schema from './schema';
 
 // Production remains on Neon HTTP. The node-postgres path is intentionally
-// limited to local Postgres URLs so sandbox verification cannot alter the
+// limited to local Postgres hosts so sandbox verification cannot alter the
 // production database adapter.
 let dbInstance: ReturnType<typeof drizzleNeon<typeof schema>> | ReturnType<typeof drizzleNodePg<typeof schema>> | null = null;
 let localPool: Pool | null = null;
@@ -17,7 +17,12 @@ export function getDb() {
       throw new Error('CRITICAL: DATABASE_URL is missing or empty during runtime execution.');
     }
 
-    if (url.startsWith('postgres://localhost') || url.startsWith('postgresql://localhost')) {
+    const parsedUrl = new URL(url);
+    const isLocalPostgres =
+      (parsedUrl.protocol === 'postgres:' || parsedUrl.protocol === 'postgresql:') &&
+      ['localhost', '127.0.0.1', '::1'].includes(parsedUrl.hostname);
+
+    if (isLocalPostgres) {
       localPool = new Pool({ connectionString: url });
       dbInstance = drizzleNodePg(localPool, { schema });
     } else {
