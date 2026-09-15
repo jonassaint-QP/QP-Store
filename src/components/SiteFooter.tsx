@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { STOREFRONT_ROUTES } from '../lib/products';
 
+const STORE_NAME = "Centaur's Apothecary & Supply Co.";
+
 // Shop links are derived from the shared storefront route registry
 // (STOREFRONT_ROUTES) rather than hard-coded, so a footer target can never
 // drift from a route that actually exists.
@@ -37,7 +39,7 @@ export default function SiteFooter() {
               [ QP ]
             </span>
             <span className="text-sm font-black tracking-tight uppercase text-white">
-              Queer Pathways
+              {STORE_NAME}
             </span>
           </div>
           <p className="text-xs font-mono text-zinc-600 leading-6 max-w-xs">

@@ -11,6 +11,8 @@ const NAV_LINKS = [
   { label: 'About', href: '/about' },
 ];
 
+const STORE_NAME = "Centaur's Apothecary & Supply Co.";
+
 export default function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,13 +26,13 @@ export default function SiteHeader() {
         <Link
           href="/"
           className="flex flex-col leading-none group"
-          aria-label="Queer Pathways — home"
+          aria-label={`${STORE_NAME} — home`}
         >
           <span className="text-xs tracking-[0.3em] font-mono uppercase text-[#4169E1] group-hover:text-[#6384e8] transition-colors">
             [ QP ]
           </span>
           <span className="text-sm font-black tracking-tight uppercase text-white group-hover:text-zinc-200 transition-colors">
-            Queer Pathways
+            {STORE_NAME}
           </span>
         </Link>
 

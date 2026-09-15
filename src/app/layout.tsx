@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Queer Pathways — High-Fidelity Kink Infrastructure",
+  title: "Centaur's Apothecary & Supply Co. — Queer Pathways",
   description:
     "A dedicated, identity-fluent digital commerce ecosystem built for the queer, gay, trans, and neurodivergent kink communities.",
 };
