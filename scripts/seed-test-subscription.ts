@@ -4,6 +4,10 @@
  * Inserts a single test subscription row so the /membership/manage cancel
  * button can be verified end-to-end without touching production billing.
  *
+ * This script intentionally uses the node-postgres driver (pg) instead of the
+ * Neon HTTP client from src/db so it can reach local Docker Postgres over TCP.
+ * Production code (src/db/index.ts) remains Neon-only and untouched.
+ *
  * Guards (hard refuse):
  *  - ALLOW_TEST_SEED must be exactly 'true'
  *  - DATABASE_URL host must be in the sandbox allowlist
@@ -12,7 +16,8 @@
  * Usage:
  *   ALLOW_TEST_SEED=true DATABASE_URL=<sandbox-url> npm run seed:test-subscription
  */
-import { getDb } from '../src/db';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 import { subscriptions } from '../src/db/schema';
 
 const ALLOWLIST = new Set(['localhost', '127.0.0.1', 'sandbox', 'staging', 'test']);
@@ -40,29 +45,34 @@ async function main() {
     throw new Error(`Refusing to seed: host "${host}" is not in the sandbox allowlist.`);
   }
 
-  const db = getDb();
+  const pool = new Pool({ connectionString: dbUrl });
+  const db = drizzle(pool, { schema: { subscriptions } });
 
-  const [row] = await db
-    .insert(subscriptions)
-    .values({
-      email: 'sblc-fixture@queerpathways.test',
-      tier: 'standard',
-      productLabel: 'Sovereign Body Lube Club — Standard (Test Fixture)',
-      sku: 'SBLC-FIXTURE-001',
-      pricePerShipment: '0.00',
-      billingDay: 1,
-      intervalMonths: 1,
-      status: 'active',
-      founding: false,
-      nextChargeDate: new Date('2027-01-01T00:00:00Z'),
-      shippingAddress: null,
-      nmiVaultId: null,
-      lastOrderId: null,
-    })
-    .returning({ id: subscriptions.id });
+  try {
+    const [row] = await db
+      .insert(subscriptions)
+      .values({
+        email: 'sblc-fixture@queerpathways.test',
+        tier: 'standard',
+        productLabel: 'Sovereign Body Lube Club — Standard (Test Fixture)',
+        sku: 'SBLC-FIXTURE-001',
+        pricePerShipment: '0.00',
+        billingDay: 1,
+        intervalMonths: 1,
+        status: 'active',
+        founding: false,
+        nextChargeDate: new Date('2027-01-01T00:00:00Z'),
+        shippingAddress: null,
+        nmiVaultId: null,
+        lastOrderId: null,
+      })
+      .returning({ id: subscriptions.id });
 
-  console.log(`Seeded sandbox fixture subscription id=${row.id}`);
-  console.log('Use this id as the subscription reference when testing /membership/manage cancel.');
+    console.log(`Seeded sandbox fixture subscription id=${row.id}`);
+    console.log('Use this id as the subscription reference when testing /membership/manage cancel.');
+  } finally {
+    await pool.end();
+  }
 }
 
 main().catch((err) => {
