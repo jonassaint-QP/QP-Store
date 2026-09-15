@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:push": "drizzle-kit push",
     "sync-catalog": "tsx scripts/syncCatalog.ts",
-    "validate:catalog": "tsx scripts/validateCatalog.ts"
+    "validate:catalog": "tsx scripts/validateCatalog.ts",
+    "seed:test-subscription": "tsx scripts/seed-test-subscription.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
