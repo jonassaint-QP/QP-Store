@@ -12,7 +12,6 @@
  * Usage:
  *   ALLOW_TEST_SEED=true DATABASE_URL=<sandbox-url> npm run seed:test-subscription
  */
-import 'dotenv/config';
 import { getDb } from '../src/db';
 import { subscriptions } from '../src/db/schema';
 
