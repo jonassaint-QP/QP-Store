@@ -11,7 +11,7 @@ export default function TermsPage() {
     <LegalLayout
       tag="Legal Document"
       title="Terms of Service"
-      lastUpdated="June 7, 2026"
+      lastUpdated="September 16, 2026"
     >
       <Section heading="1. Age Requirement">
         <p>
@@ -63,17 +63,17 @@ export default function TermsPage() {
       <Section heading="5. Refund Policy">
         <p>
           Due to the intimate nature of our products, all sales are{' '}
-          <strong className="text-white">final on opened or used items</strong>. Unopened items
-          in original packaging may be eligible for exchange within 14 days of delivery.
-          Contact our support team to initiate a return request.
-        </p>
-        <p>
-          Defective or incorrect items will be replaced or refunded at no cost to you.
+          <strong className="text-white">final on opened or used items</strong>, and
+          completed charges and shipments are not refundable. Where a product arrives
+          damaged or defective, or where we shipped the wrong item, we will replace it or
+          refund it at no cost to you. The storefront refund policy at /refund-policy
+          governs and controls where it differs from this summary.
         </p>
       </Section>
 
       <Section heading="6. Shipping & Discretion">
         <p>
+          We ship to <strong className="text-white">United States addresses only</strong>.
           All orders ship in <strong className="text-white">plain, unbranded packaging</strong>.
           Return addresses on shipping labels will not reference the nature of the contents.
           We are not responsible for delays caused by carriers or customs.
@@ -115,10 +115,10 @@ export default function TermsPage() {
         <p>
           For questions about these terms, contact us at{' '}
           <a
-            href="mailto:legal@queerpathways.com"
+            href="mailto:jonassaint@queerpathways.org"
             className="text-white underline hover:text-zinc-300 transition-colors"
           >
-            legal@queerpathways.com
+            jonassaint@queerpathways.org
           </a>
           .
         </p>

@@ -11,7 +11,7 @@ export default function RefundPolicyPage() {
     <LegalLayout
       tag="Legal Document"
       title="Refund & Return Policy"
-      lastUpdated="September 8, 2026"
+      lastUpdated="September 16, 2026"
     >
       <Section heading="The Short Version">
         <p>
@@ -82,8 +82,7 @@ export default function RefundPolicyPage() {
 
       <Section heading="Shipping Territory">
         <p>
-          The Club ships to United States addresses at launch. Canada is a future,
-          non-binding target, not a current offer.
+          The Club ships to United States addresses only.
         </p>
       </Section>
 
