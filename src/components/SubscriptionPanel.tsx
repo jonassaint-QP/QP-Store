@@ -2,35 +2,40 @@
 
 import Link from 'next/link';
 import { SKU_REGISTRY } from '@/lib/sku-registry';
+import { IS_CLUB_SUSPENDED } from '@/lib/subscriptions';
 
 type TierKey = 'main-stage' | 'throne' | 'estate';
 
+// Brand names are deliberately absent from all public-facing copy while the
+// M.D. Science / Swiss Navy consent hold is in force (2026-09-16). The SKU
+// codes below stay internal — they resolve prices from SKU_REGISTRY and are
+// never rendered.
 const TIER_COPY: Record<TierKey, { label: string; sku: string; size: string; copy: string; availability?: string }> = {
   'main-stage': {
     label: 'Main Stage',
     sku: 'SNSL16',
-    size: 'Swiss Navy silicone lubricant — 16 oz pump',
+    size: 'Silicone lubricant — 16 oz pump',
     copy: 'The flagship of the club: one full-size unit, refilled on your cadence, sealed and ready.',
-    availability: 'Founding-member allocation',
   },
   throne: {
     label: 'Throne',
     sku: 'SNSL32',
-    size: 'Swiss Navy silicone lubricant — 32 oz pump',
-    copy: 'The 32 oz bulk format for the household that hosts, travels, or simply refuses to ration.',
-    availability: 'Founding-member allocation',
+    size: 'Silicone lubricant — 32 oz pump',
+    copy: 'The bulk format for the household that hosts, travels, or simply refuses to ration.',
   },
   estate: {
     label: 'The Estate',
     sku: 'SNSL1G',
-    size: 'Swiss Navy silicone lubricant — 128 oz, one gallon',
+    size: 'Silicone lubricant — 128 oz, one gallon',
     copy: 'The tier for the home that is a destination — the playroom with its own shelf, the hosts who\u2019ll never hear \u201Cwe\u2019re out.\u201D',
-    availability: 'Founding-member allocation',
   },
 };
 
 const BTN =
   'inline-flex h-11 items-center justify-center px-6 text-xs font-bold tracking-[0.2em] uppercase bg-white text-black transition-colors hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed';
+
+const BTN_DISABLED =
+  'inline-flex h-11 items-center justify-center px-6 text-xs font-bold tracking-[0.2em] uppercase border border-zinc-700 text-zinc-500 cursor-not-allowed';
 
 export default function SubscriptionPanel() {
   return (
@@ -44,7 +49,7 @@ export default function SubscriptionPanel() {
           Some doors don&apos;t open. They&apos;re opened.
         </h2>
         <p className="text-sm font-mono text-zinc-400 leading-7 max-w-2xl">
-          A standing supply of Swiss Navy silicone, shipped on the day and rhythm you choose, at a
+          A standing supply of platinum-cure silicone, shipped on the day and rhythm you choose, at a
           flat per-shipment price that never changes with your interval. No apps. No lock-in. No
           fine-print games. One less thing your body has to ask for.
         </p>
@@ -52,6 +57,20 @@ export default function SubscriptionPanel() {
           Gear, not medicine. Sovereignty, not shame.
         </blockquote>
       </div>
+
+      {/* Consent hold notice — shown only while the hold is in force. */}
+      {IS_CLUB_SUSPENDED && (
+        <div className="border border-[#CBB26A]/40 bg-black p-6 md:p-8 flex flex-col gap-3">
+          <p className="text-xs tracking-[0.3em] font-mono uppercase text-[#CBB26A]">
+            [ Enrollment Paused ]
+          </p>
+          <p className="text-sm font-mono text-zinc-400 leading-7 max-w-2xl">
+            New enrollments are paused while we complete a supplier authorization. Existing members
+            are unaffected — manage your membership at /membership/manage as usual, and nothing
+            changes about your cadence, pricing, or shipments.
+          </p>
+        </div>
+      )}
 
       {/* Tiers */}
       <div>
@@ -81,12 +100,18 @@ export default function SubscriptionPanel() {
                 {price && <p className="text-sm font-mono text-white tabular-nums">${price} per shipment</p>}
                 <p className="text-sm font-mono text-zinc-400 leading-7">{tier.copy}</p>
 
-                <Link
-                  href={`/checkout/subscription?tier=${key}`}
-                  className={`${BTN} mt-auto self-start`}
-                >
-                  Choose {tier.label}
-                </Link>
+                {IS_CLUB_SUSPENDED ? (
+                  <span className={`${BTN_DISABLED} mt-auto self-start`} aria-disabled="true">
+                    Temporarily Unavailable
+                  </span>
+                ) : (
+                  <Link
+                    href={`/checkout/subscription?tier=${key}`}
+                    className={`${BTN} mt-auto self-start`}
+                  >
+                    Choose {tier.label}
+                  </Link>
+                )}
               </div>
             );
           })}

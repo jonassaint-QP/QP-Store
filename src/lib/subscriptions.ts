@@ -5,6 +5,19 @@
  * no DB access here. Edge-day rule: a customer-chosen billing day of 29, 30,
  * or 31 shifts to the last calendar day of any month lacking that date
  * (disclosed at checkout and in the finalized terms).
+ *
+ * ⚠ CONSENT HOLD — 2026-09-16
+ * Every paid tier below is an M.D. Science Lab / Swiss Navy SKU, and the
+ * brand's Authorized Online Seller Agreement has not been executed. Joshua
+ * elected full removal on 2026-09-16 rather than waiting on the agreement.
+ *
+ * LIVE_TIERS is therefore empty: new subscription checkout is suspended.
+ * Tier metadata is retained VERBATIM so restoring the line is a flag flip
+ * once consent lands — no re-add, no re-pricing, no history lost.
+ *
+ * SNSL16 and SNSL32 have no PRODUCT record, which is why the catalog sweep
+ * in src/lib/products.ts does not cover them. Do not assume a clean catalog
+ * means a clean club.
  */
 
 export const SUBSCRIPTION_TIERS = {
@@ -30,8 +43,17 @@ export const SUBSCRIPTION_TIERS = {
 
 export type SubscriptionTier = keyof typeof SUBSCRIPTION_TIERS;
 
-/** Tiers available for live subscription checkout (all three tiers live). */
-export const LIVE_TIERS = ['main-stage', 'throne', 'estate'] as const;
+/**
+ * Tiers available for live subscription checkout.
+ *
+ * EMPTY BY DESIGN while the brand consent hold is in force (2026-09-16).
+ * Restoration: list 'main-stage', 'throne', 'estate' again. Consumers should
+ * read this array rather than assuming the tiers are sellable.
+ */
+export const LIVE_TIERS: readonly SubscriptionTier[] = [];
+
+/** True while new subscription checkout is suspended. */
+export const IS_CLUB_SUSPENDED = LIVE_TIERS.length === 0;
 
 export const INTERVAL_MONTHS = [1, 2, 3, 4, 6, 12] as const;
 
