@@ -1,126 +1,77 @@
 import type { Metadata } from 'next';
-import LegalLayout, { Section } from '@/components/LegalLayout';
+import LegalLayout from '@/components/LegalLayout';
+import Section from '@/components/Section';
 
 export const metadata: Metadata = {
   title: 'Terms of Service — Queer Pathways',
-  robots: { index: false, follow: false },
+  description:
+    'Terms of service for Queer Pathways LLC, including ordering, shipping, refund, and privacy terms.',
 };
 
 export default function TermsPage() {
   return (
     <LegalLayout
-      tag="Legal Document"
       title="Terms of Service"
-      lastUpdated="June 7, 2026"
+      lastUpdated="September 16, 2026"
     >
-      <Section heading="1. Age Requirement">
+      <Section heading="1. Agreement">
         <p>
-          You must be at least <strong className="text-white">18 years of age</strong> to
-          access or use this website. By entering this site, you confirm that you meet this
-          requirement. If you are under 18, you must leave immediately.
-        </p>
-        <p>
-          We reserve the right to terminate access for any user we reasonably believe to be
-          under the age of 18.
+          By accessing or purchasing from queerpathways.com you agree to these
+          terms. These terms govern retail orders placed through the storefront.
+          Clinical services are governed separately and operate on a distinct
+          domain and clinical record system.
         </p>
       </Section>
 
-      <Section heading="2. Nature of Content">
+      <Section heading="2. Eligibility">
         <p>
-          This website contains <strong className="text-white">explicit adult content</strong>,
-          including images, descriptions, and products of a sexual and/or kink nature. By
-          proceeding, you confirm that:
+          You must be 18 years of age or older to order. By placing an order you
+          confirm you meet that requirement.
         </p>
-        <ul className="list-none flex flex-col gap-2 pl-4 border-l border-zinc-800">
-          <li>— You are not offended by adult-oriented materials.</li>
-          <li>— Viewing or purchasing such materials is legal in your jurisdiction.</li>
-          <li>— You are accessing this site of your own free will.</li>
-        </ul>
       </Section>
 
-      <Section heading="3. Acceptable Use">
-        <p>You agree not to:</p>
-        <ul className="list-none flex flex-col gap-2 pl-4 border-l border-zinc-800">
-          <li>— Use this site for any unlawful purpose.</li>
-          <li>— Attempt to gain unauthorized access to any part of the platform.</li>
-          <li>— Reproduce, redistribute, or resell any content without written permission.</li>
-          <li>— Submit false, misleading, or fraudulent information during checkout.</li>
-        </ul>
+      <Section heading="3. Orders">
+        <p>
+          All orders are subject to acceptance and availability. We may decline
+          or cancel an order where a product is unavailable, where pricing or
+          description contains an error, or where an order appears fraudulent.
+        </p>
       </Section>
 
-      <Section heading="4. Products & Orders">
+      <Section heading="4. Shipping">
         <p>
-          All products are intended for use by consenting adults. Product descriptions are
-          provided for informational purposes. We do not provide medical advice. Consult a
-          qualified healthcare professional for any medical concerns.
-        </p>
-        <p>
-          We reserve the right to refuse or cancel orders at our discretion, including where
-          we suspect fraud or policy violations.
+          We ship to United States addresses only. Shipping timelines are
+          estimates and are not guaranteed.
         </p>
       </Section>
 
       <Section heading="5. Refund Policy">
         <p>
-          Due to the intimate nature of our products, all sales are{' '}
-          <strong className="text-white">final on opened or used items</strong>. Unopened items
-          in original packaging may be eligible for exchange within 14 days of delivery.
-          Contact our support team to initiate a return request.
-        </p>
-        <p>
-          Defective or incorrect items will be replaced or refunded at no cost to you.
+          All completed charges and shipments are final and are not refundable,
+          except where a product arrives damaged or defective or we shipped the
+          wrong item. The full storefront refund policy at /refund-policy
+          governs and controls where it differs from this summary.
         </p>
       </Section>
 
-      <Section heading="6. Shipping & Discretion">
+      <Section heading="6. Privacy">
         <p>
-          All orders ship in <strong className="text-white">plain, unbranded packaging</strong>.
-          Return addresses on shipping labels will not reference the nature of the contents.
-          We are not responsible for delays caused by carriers or customs.
+          We collect only the information required to fulfil your order and
+          meet our legal obligations. We do not sell customer data.
         </p>
       </Section>
 
-      <Section heading="7. Intellectual Property">
+      <Section heading="7. Contact">
         <p>
-          All site content, product imagery, copy, and branding are the property of Queer
-          Pathways and may not be used without express written consent.
+          Legal and order inquiries: jonassaint@queerpathways.org. Write to this
+          address for any question about these terms or about an order.
         </p>
       </Section>
 
-      <Section heading="8. Limitation of Liability">
+      <Section heading="8. Changes">
         <p>
-          This site and its products are provided &quot;as is.&quot; To the fullest extent permitted by
-          law, Queer Pathways disclaims all warranties and shall not be liable for any
-          indirect, incidental, or consequential damages arising from your use of this site
-          or its products.
-        </p>
-      </Section>
-
-      <Section heading="9. Governing Law">
-        <p>
-          These terms are governed by the laws of the jurisdiction in which Queer Pathways
-          operates, without regard to conflict of law provisions.
-        </p>
-      </Section>
-
-      <Section heading="10. Changes to These Terms">
-        <p>
-          We may update these terms at any time. Continued use of the site following any
-          update constitutes acceptance of the revised terms. The &quot;last updated&quot; date at the
-          top of this page reflects the most recent revision.
-        </p>
-      </Section>
-
-      <Section heading="11. Contact">
-        <p>
-          For questions about these terms, contact us at{' '}
-          <a
-            href="mailto:legal@queerpathways.com"
-            className="text-white underline hover:text-zinc-300 transition-colors"
-          >
-            legal@queerpathways.com
-          </a>
-          .
+          We may update these terms. The version published on this page at the
+          time of your order governs that order.
         </p>
       </Section>
     </LegalLayout>
