@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { STOREFRONT_ROUTES, type StorefrontRoute } from '@/lib/products';
+import { getHomepageCards } from '@/lib/storefront-grid';
 
 export const metadata: Metadata = {
   title: 'Queer Pathways — High-Fidelity Kink Infrastructure',
@@ -8,50 +8,19 @@ export const metadata: Metadata = {
     'Industrial-grade gear, somatic scaffolding, and tactical kink infrastructure for the queer, gay, trans, and neurodivergent communities.',
 };
 
-/**
- * Forward-compatible view of a route record.
- *
- * `ctaLabel` is an optional explicit button label for a route. Until it lands
- * on `StorefrontRoute` in the registry, this intersection lets the page read it
- * without a cast and without a `tsc --noEmit` error. When the field is added to
- * the registry, this type alias can be deleted and `route.ctaLabel` read
- * directly.
- */
-type RouteWithCtaLabel = StorefrontRoute & { ctaLabel?: string };
-
-// Category cards are derived from the shared storefront route registry
-// (STOREFRONT_ROUTES) rather than hard-coded, so a homepage target can never
-// drift from a route that actually exists.
+// The catalog grid is derived from the route registry via `getHomepageCards()`.
 //
 // Fixed 2026-09-16: the previous hard-coded targets /shop/slings-anchors,
 // /shop/technical-toys, /shop/lubes, and /shop/metabolic were retired on
 // 2026-09-10 and are edge-closed with 410 Gone in public/_redirects — every
 // category card on the homepage was a dead link to a gone route.
 //
-// `loop-subscription` is deliberately excluded here — it is the non-buyable
-// membership panel, not a product-backed catalog route.
-const CATEGORIES = STOREFRONT_ROUTES.filter(
-  (route) => route.slug !== 'loop-subscription'
-).map((route, index) => {
-  const record = route as RouteWithCtaLabel;
-
-  return {
-    tag: `Category ${String.fromCharCode(65 + index)}`,
-    title: route.title,
-    // Suppressed when the descriptor is identical to the title: two routes
-    // collide today ('Anal Sex', 'Waterproof & Specialty Hardware'), and
-    // rendering the same string twice reads as a bug. Registry data is not
-    // modified here — only the card's rendering of it.
-    subtitle: route.descriptor === route.title ? null : route.descriptor,
-    description: route.description,
-    href: `/shop/${route.slug}`,
-    // An explicit label on the route record wins; otherwise a grammatical
-    // default. The descriptor is never interpolated into button copy —
-    // `View ${descriptor}` produced "View Anal Sex", "View Fisting",
-    // "View Lube".
-    cta: record.ctaLabel ?? `Shop ${route.title}`,
-  };
-});
+// This component holds NO label logic, no merchandising rule, and no product
+// slug. Card labels, CTA copy, and the grid/not-grid decision all live on the
+// route routing layer (src/lib/storefront-grid.ts), because a page that knows
+// one product's slug is a page that has to be edited every time the catalog
+// changes.
+const CATEGORIES = getHomepageCards();
 
 export default function HomePage() {
   return (
@@ -118,14 +87,14 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-zinc-800">
-          {CATEGORIES.map(({ tag, title, subtitle, description, href, cta }) => (
+          {CATEGORIES.map(({ slug, label, title, subtitle, description, href, ctaLabel }) => (
             <div
-              key={href}
+              key={slug}
               className="bg-black p-8 flex flex-col gap-4 group"
             >
               <div className="flex flex-col gap-1">
                 <p className="text-xs tracking-[0.25em] font-mono uppercase text-zinc-700">
-                  {tag}
+                  {label}
                 </p>
                 <h3 className="text-xl font-black tracking-tight uppercase text-white">
                   {title}
@@ -143,7 +112,7 @@ export default function HomePage() {
                 href={href}
                 className="mt-auto text-xs font-bold font-mono tracking-[0.2em] uppercase text-zinc-400 hover:text-white transition-colors flex items-center gap-2"
               >
-                {cta} →
+                {ctaLabel} →
               </Link>
             </div>
           ))}
