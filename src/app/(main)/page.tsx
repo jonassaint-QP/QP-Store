@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { getHomepageCards } from '@/lib/storefront-grid';
 
 export const metadata: Metadata = {
   title: 'Queer Pathways — High-Fidelity Kink Infrastructure',
@@ -7,44 +8,19 @@ export const metadata: Metadata = {
     'Industrial-grade gear, somatic scaffolding, and tactical kink infrastructure for the queer, gay, trans, and neurodivergent communities.',
 };
 
-const CATEGORIES = [
-  {
-    tag: 'Category A',
-    title: 'Slings & Anchors',
-    subtitle: 'Somatic Scaffolding',
-    description:
-      'Heavy-duty, load-bearing play slings and industrial hardware anchors engineered for absolute containment and pelvic alignment.',
-    href: '/shop/slings-anchors',
-    cta: 'View Hardware',
-  },
-  {
-    tag: 'Category B',
-    title: 'Technical Toys',
-    subtitle: 'Material Discipline',
-    description:
-      'Platinum-cured silicone, weighted surgical steel, and high-fidelity sensation hardware. Zero compromise on material quality.',
-    href: '/shop/technical-toys',
-    cta: 'View Toys',
-  },
-  {
-    tag: 'Category C',
-    title: 'Frictionless Suite',
-    subtitle: 'Specialized Lubes',
-    description:
-      'Heavy-viscosity concentrates and medical-grade silicones formulated for advanced play. Custom-mix precision, zero cognitive overhead.',
-    href: '/shop/lubes',
-    cta: 'View Lubes',
-  },
-  {
-    tag: 'Category D',
-    title: 'Metabolic Recovery',
-    subtitle: 'Maintenance & Recovery',
-    description:
-      'Streamlined fiber protocols and post-play electrolyte packs that stabilize your system and clear the post-play dopamine crash.',
-    href: '/shop/metabolic',
-    cta: 'View Recovery',
-  },
-];
+// The catalog grid is derived from the route registry via `getHomepageCards()`.
+//
+// Fixed 2026-09-16: the previous hard-coded targets /shop/slings-anchors,
+// /shop/technical-toys, /shop/lubes, and /shop/metabolic were retired on
+// 2026-09-10 and are edge-closed with 410 Gone in public/_redirects — every
+// category card on the homepage was a dead link to a gone route.
+//
+// This component holds NO label logic, no merchandising rule, and no product
+// slug. Card labels, CTA copy, and the grid/not-grid decision all live on the
+// route routing layer (src/lib/storefront-grid.ts), because a page that knows
+// one product's slug is a page that has to be edited every time the catalog
+// changes.
+const CATEGORIES = getHomepageCards();
 
 export default function HomePage() {
   return (
@@ -111,21 +87,23 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-zinc-800">
-          {CATEGORIES.map(({ tag, title, subtitle, description, href, cta }) => (
+          {CATEGORIES.map(({ slug, label, title, subtitle, description, href, ctaLabel }) => (
             <div
-              key={href}
+              key={slug}
               className="bg-black p-8 flex flex-col gap-4 group"
             >
               <div className="flex flex-col gap-1">
                 <p className="text-xs tracking-[0.25em] font-mono uppercase text-zinc-700">
-                  {tag}
+                  {label}
                 </p>
                 <h3 className="text-xl font-black tracking-tight uppercase text-white">
                   {title}
                 </h3>
-                <p className="text-xs font-mono uppercase text-zinc-600 tracking-widest">
-                  {subtitle}
-                </p>
+                {subtitle ? (
+                  <p className="text-xs font-mono uppercase text-zinc-600 tracking-widest">
+                    {subtitle}
+                  </p>
+                ) : null}
               </div>
               <p className="text-sm font-mono text-zinc-500 leading-7">
                 {description}
@@ -134,7 +112,7 @@ export default function HomePage() {
                 href={href}
                 className="mt-auto text-xs font-bold font-mono tracking-[0.2em] uppercase text-zinc-400 hover:text-white transition-colors flex items-center gap-2"
               >
-                {cta} →
+                {ctaLabel} →
               </Link>
             </div>
           ))}
