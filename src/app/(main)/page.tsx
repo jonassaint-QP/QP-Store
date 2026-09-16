@@ -1,12 +1,23 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { STOREFRONT_ROUTES } from '@/lib/products';
+import { STOREFRONT_ROUTES, type StorefrontRoute } from '@/lib/products';
 
 export const metadata: Metadata = {
   title: 'Queer Pathways — High-Fidelity Kink Infrastructure',
   description:
     'Industrial-grade gear, somatic scaffolding, and tactical kink infrastructure for the queer, gay, trans, and neurodivergent communities.',
 };
+
+/**
+ * Forward-compatible view of a route record.
+ *
+ * `ctaLabel` is an optional explicit button label for a route. Until it lands
+ * on `StorefrontRoute` in the registry, this intersection lets the page read it
+ * without a cast and without a `tsc --noEmit` error. When the field is added to
+ * the registry, this type alias can be deleted and `route.ctaLabel` read
+ * directly.
+ */
+type RouteWithCtaLabel = StorefrontRoute & { ctaLabel?: string };
 
 // Category cards are derived from the shared storefront route registry
 // (STOREFRONT_ROUTES) rather than hard-coded, so a homepage target can never
@@ -21,14 +32,26 @@ export const metadata: Metadata = {
 // membership panel, not a product-backed catalog route.
 const CATEGORIES = STOREFRONT_ROUTES.filter(
   (route) => route.slug !== 'loop-subscription'
-).map((route, index) => ({
-  tag: `Category ${String.fromCharCode(65 + index)}`,
-  title: route.title,
-  subtitle: route.descriptor,
-  description: route.description,
-  href: `/shop/${route.slug}`,
-  cta: `View ${route.descriptor}`,
-}));
+).map((route, index) => {
+  const record = route as RouteWithCtaLabel;
+
+  return {
+    tag: `Category ${String.fromCharCode(65 + index)}`,
+    title: route.title,
+    // Suppressed when the descriptor is identical to the title: two routes
+    // collide today ('Anal Sex', 'Waterproof & Specialty Hardware'), and
+    // rendering the same string twice reads as a bug. Registry data is not
+    // modified here — only the card's rendering of it.
+    subtitle: route.descriptor === route.title ? null : route.descriptor,
+    description: route.description,
+    href: `/shop/${route.slug}`,
+    // An explicit label on the route record wins; otherwise a grammatical
+    // default. The descriptor is never interpolated into button copy —
+    // `View ${descriptor}` produced "View Anal Sex", "View Fisting",
+    // "View Lube".
+    cta: record.ctaLabel ?? `Shop ${route.title}`,
+  };
+});
 
 export default function HomePage() {
   return (
@@ -107,9 +130,11 @@ export default function HomePage() {
                 <h3 className="text-xl font-black tracking-tight uppercase text-white">
                   {title}
                 </h3>
-                <p className="text-xs font-mono uppercase text-zinc-600 tracking-widest">
-                  {subtitle}
-                </p>
+                {subtitle ? (
+                  <p className="text-xs font-mono uppercase text-zinc-600 tracking-widest">
+                    {subtitle}
+                  </p>
+                ) : null}
               </div>
               <p className="text-sm font-mono text-zinc-500 leading-7">
                 {description}
