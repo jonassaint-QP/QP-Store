@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { STOREFRONT_ROUTES } from '@/lib/products';
 
 export const metadata: Metadata = {
   title: 'Queer Pathways — High-Fidelity Kink Infrastructure',
@@ -7,44 +8,27 @@ export const metadata: Metadata = {
     'Industrial-grade gear, somatic scaffolding, and tactical kink infrastructure for the queer, gay, trans, and neurodivergent communities.',
 };
 
-const CATEGORIES = [
-  {
-    tag: 'Category A',
-    title: 'Slings & Anchors',
-    subtitle: 'Somatic Scaffolding',
-    description:
-      'Heavy-duty, load-bearing play slings and industrial hardware anchors engineered for absolute containment and pelvic alignment.',
-    href: '/shop/slings-anchors',
-    cta: 'View Hardware',
-  },
-  {
-    tag: 'Category B',
-    title: 'Technical Toys',
-    subtitle: 'Material Discipline',
-    description:
-      'Platinum-cured silicone, weighted surgical steel, and high-fidelity sensation hardware. Zero compromise on material quality.',
-    href: '/shop/technical-toys',
-    cta: 'View Toys',
-  },
-  {
-    tag: 'Category C',
-    title: 'Frictionless Suite',
-    subtitle: 'Specialized Lubes',
-    description:
-      'Heavy-viscosity concentrates and medical-grade silicones formulated for advanced play. Custom-mix precision, zero cognitive overhead.',
-    href: '/shop/lubes',
-    cta: 'View Lubes',
-  },
-  {
-    tag: 'Category D',
-    title: 'Metabolic Recovery',
-    subtitle: 'Maintenance & Recovery',
-    description:
-      'Streamlined fiber protocols and post-play electrolyte packs that stabilize your system and clear the post-play dopamine crash.',
-    href: '/shop/metabolic',
-    cta: 'View Recovery',
-  },
-];
+// Category cards are derived from the shared storefront route registry
+// (STOREFRONT_ROUTES) rather than hard-coded, so a homepage target can never
+// drift from a route that actually exists.
+//
+// Fixed 2026-09-16: the previous hard-coded targets /shop/slings-anchors,
+// /shop/technical-toys, /shop/lubes, and /shop/metabolic were retired on
+// 2026-09-10 and are edge-closed with 410 Gone in public/_redirects — every
+// category card on the homepage was a dead link to a gone route.
+//
+// `loop-subscription` is deliberately excluded here — it is the non-buyable
+// membership panel, not a product-backed catalog route.
+const CATEGORIES = STOREFRONT_ROUTES.filter(
+  (route) => route.slug !== 'loop-subscription'
+).map((route, index) => ({
+  tag: `Category ${String.fromCharCode(65 + index)}`,
+  title: route.title,
+  subtitle: route.descriptor,
+  description: route.description,
+  href: `/shop/${route.slug}`,
+  cta: `View ${route.descriptor}`,
+}));
 
 export default function HomePage() {
   return (
