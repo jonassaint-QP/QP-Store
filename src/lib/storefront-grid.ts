@@ -15,13 +15,18 @@
  *      the page. It is now the `showInHomepageGrid` flag on the record below.
  *      The page no longer knows any product slug.
  *
+ * LABEL SEQUENCE
+ * Merchandised routes are labelled contiguously A through H. An earlier pass
+ * left a gap (A, B, D, E, F, G, H, I) because the non-merchandised
+ * subscription route held a letter, which reads to a customer as a missing
+ * card rather than a deliberate skip.
+ *
  * WHY IT IS NOT ON `StorefrontRoute`
  * The intended home for these fields is the route record itself. It is here
  * instead because the only write path available to us is a full-file rewrite,
  * and `products.ts` is ~64KB of live catalog data — rewriting it in full to
- * add two presentation fields risks corrupting the registry. This module is
- * the narrowest change that removes the coupling without touching catalog
- * data.
+ * add presentation fields risks corrupting the registry. This module is the
+ * narrowest change that removes the coupling without touching catalog data.
  *
  * THE GUARANTEE THAT MAKES IT SAFE
  * `GRID_META` is typed `Record<StorefrontRouteSlug, GridMeta>`. Add a route to
@@ -86,39 +91,42 @@ export const GRID_META: Record<StorefrontRouteSlug, GridMeta> = {
     subtitleOverride: 'Plugs, Probes & Dilators',
   },
   'loop-subscription': {
-    label: 'Category C',
+    // Not merchandised, so this label is never rendered. Empty rather than a
+    // stale letter: a held-back letter on this record is exactly what put a
+    // visible gap in the A–H sequence.
+    label: '',
     ctaLabel: 'Explore the Club',
     showInHomepageGrid: false,
   },
   'black-sm': {
-    label: 'Category D',
+    label: 'Category C',
     ctaLabel: 'Shop Impact Gear',
     showInHomepageGrid: true,
   },
   'blue-light-oral': {
-    label: 'Category E',
+    label: 'Category D',
     ctaLabel: 'Shop Oral Play',
     showInHomepageGrid: true,
   },
   'green-hustler-sugar': {
-    label: 'Category F',
+    label: 'Category E',
     ctaLabel: 'Shop Power Dynamics',
     showInHomepageGrid: true,
   },
   'grey-bondage': {
-    label: 'Category G',
+    label: 'Category F',
     ctaLabel: 'Shop Bondage',
     showInHomepageGrid: true,
   },
   'red-fisting': {
-    label: 'Category H',
+    label: 'Category G',
     ctaLabel: 'Shop Depth Play',
     showInHomepageGrid: true,
     // Softened 2026-09-16 per merchant-policy review.
     titleOverride: 'Depth Play',
   },
   'yellow-watersports': {
-    label: 'Category I',
+    label: 'Category H',
     ctaLabel: 'Shop Specialty Hardware',
     showInHomepageGrid: true,
     subtitleOverride: 'Sheets, Suits & Specialty Gear',
