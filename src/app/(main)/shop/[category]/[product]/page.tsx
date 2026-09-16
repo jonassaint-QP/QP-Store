@@ -3,13 +3,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import {
-  PRODUCTS,
-  getProductBySlug,
   getStorefrontRouteBySlug,
   getStorefrontRouteForProduct,
-  getProductsByStorefrontRoute,
   formatPrice,
 } from '@/lib/products';
+import {
+  publicProducts,
+  getPublicProductBySlug,
+  getPublicProductsByStorefrontRoute,
+} from '@/lib/catalog-withholding';
 import ProductActions from '@/components/ProductActions';
 import ReviewSection from '@/components/ReviewSection';
 
@@ -17,8 +19,10 @@ interface PageProps {
   params: Promise<{ category: string; product: string }>;
 }
 
+// Static params come from the public catalogue only, so a withheld product is
+// never pre-rendered as a reachable route.
 export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({
+  return publicProducts().map((p) => ({
     category: getStorefrontRouteForProduct(p),
     product: p.slug,
   }));
@@ -26,7 +30,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { product: productSlug, category: categorySlug } = await params;
-  const product = getProductBySlug(productSlug);
+  const product = getPublicProductBySlug(productSlug);
   if (!product || getStorefrontRouteForProduct(product) !== categorySlug) {
     return { title: 'Not Found' };
   }
@@ -38,7 +42,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
   const { product: productSlug, category: categorySlug } = await params;
-  const product = getProductBySlug(productSlug);
+  // Resolves only for products that are publicly merchandisable. A withheld
+  // (pending-consent) slug falls through to notFound() below, so the URL 404s
+  // rather than serving a record whose brand consent is not executed.
+  const product = getPublicProductBySlug(productSlug);
 
   if (!product) notFound();
 
@@ -50,8 +57,9 @@ export default async function ProductPage({ params }: PageProps) {
 
   const route = getStorefrontRouteBySlug(ownerRouteSlug)!;
 
-  // Related products — same owning public route, different product
-  const related = getProductsByStorefrontRoute(route.slug).filter(
+  // Related products — same owning public route, different product. Read from
+  // the public catalogue so the block cannot recommend a withheld SKU.
+  const related = getPublicProductsByStorefrontRoute(route.slug).filter(
     (p) => p.id !== product.id
   );
 
