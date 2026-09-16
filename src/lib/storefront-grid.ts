@@ -30,9 +30,10 @@
  * than an optional field on the route would have given.
  *
  * WHEN TO COLLAPSE THIS BACK
- * If a line-level patch path is ever restored, fold `label`, `ctaLabel`, and
- * `showInHomepageGrid` onto `StorefrontRoute` in products.ts and delete this
- * file. Nothing else depends on it.
+ * If a line-level patch path is ever restored, fold `label`, `ctaLabel`,
+ * `titleOverride`, `subtitleOverride`, and `showInHomepageGrid` onto
+ * `StorefrontRoute` in products.ts and delete this file. Nothing else depends
+ * on it.
  */
 import { STOREFRONT_ROUTES, type StorefrontRoute, type StorefrontRouteSlug } from '@/lib/products';
 
@@ -53,6 +54,13 @@ export type GridMeta = {
    */
   showInHomepageGrid: boolean;
   /**
+   * Presentation-layer title, used where the registry title carries an
+   * explicit term that must not appear on the undifferentiated public
+   * homepage grid (payment-processor high-risk adult merchant guidance).
+   * Registry data is untouched; the category landing page is unaffected.
+   */
+  titleOverride?: string;
+  /**
    * Optional card subtitle override, used where the registry descriptor is
    * identical to the title and would therefore render the same string twice.
    */
@@ -71,8 +79,10 @@ export const GRID_META: Record<StorefrontRouteSlug, GridMeta> = {
   },
   'anal-sex': {
     label: 'Category B',
-    ctaLabel: 'Shop Anal Sex',
+    ctaLabel: 'Shop Ass Play',
     showInHomepageGrid: true,
+    // Softened 2026-09-16 per merchant-policy review.
+    titleOverride: 'Ass Play',
     subtitleOverride: 'Plugs, Probes & Dilators',
   },
   'loop-subscription': {
@@ -102,8 +112,10 @@ export const GRID_META: Record<StorefrontRouteSlug, GridMeta> = {
   },
   'red-fisting': {
     label: 'Category H',
-    ctaLabel: 'Shop Fisting',
+    ctaLabel: 'Shop Depth Play',
     showInHomepageGrid: true,
+    // Softened 2026-09-16 per merchant-policy review.
+    titleOverride: 'Depth Play',
   },
   'yellow-watersports': {
     label: 'Category I',
@@ -133,17 +145,21 @@ export function getHomepageCards(): HomepageCard[] {
     (route: StorefrontRoute) => GRID_META[route.slug].showInHomepageGrid
   ).map((route: StorefrontRoute) => {
     const meta = GRID_META[route.slug];
+
+    // Presentation overrides win. The registry is not modified.
+    const title = meta.titleOverride ?? route.title;
     const subtitle = meta.subtitleOverride ?? route.descriptor;
 
     return {
       slug: route.slug,
       label: meta.label,
-      title: route.title,
+      title,
       // Suppressed rather than duplicated: on two routes the registry
       // descriptor is identical to the title, and rendering the same string
-      // twice reads as a bug. Registry data is not modified — only the way
-      // the card presents it.
-      subtitle: subtitle === route.title ? null : subtitle,
+      // twice reads as a bug. Compared against the EFFECTIVE title, so a
+      // softened title cannot collide with its descriptor. Registry data is
+      // not modified — only the way the card presents it.
+      subtitle: subtitle === title ? null : subtitle,
       description: route.description,
       href: `/shop/${route.slug}`,
       ctaLabel: meta.ctaLabel,
