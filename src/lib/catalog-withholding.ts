@@ -29,6 +29,7 @@ import {
   PRODUCTS,
   getProductBySlug as getProductBySlugFromRegistry,
   getProductsByStorefrontRoute as getProductsByStorefrontRouteFromRegistry,
+  type StorefrontRouteSlug,
 } from '@/lib/products';
 
 /** Machine-readable withdrawal status. */
@@ -142,7 +143,7 @@ export function getPublicProductBySlug(slug: string) {
 }
 
 /** Public replacement for getProductsByStorefrontRoute. */
-export function getPublicProductsByStorefrontRoute(storefrontRouteSlug: string) {
+export function getPublicProductsByStorefrontRoute(storefrontRouteSlug: StorefrontRouteSlug) {
   return getProductsByStorefrontRouteFromRegistry(storefrontRouteSlug).filter(
     (product) => !isWithheldProduct(product)
   );
