@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${route.title} — Queer Pathways`,
     description: route.description,
+    robots: route.slug === 'loop-subscription' ? { index: false, follow: true } : undefined,
   };
 }
 

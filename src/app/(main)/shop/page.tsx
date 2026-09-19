@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { PRODUCTS, STOREFRONT_ROUTES, getProductsByStorefrontRoute } from '@/lib/products';
+import { STOREFRONT_ROUTES } from '@/lib/products';
+import { publicProducts, getPublicProductsByStorefrontRoute } from '@/lib/catalog-withholding';
 import ProductCard from '@/components/ProductCard';
 
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ export default function ShopPage() {
             The Shop
           </h1>
           <p className="text-sm font-mono text-zinc-500 leading-7 mt-2">
-            {PRODUCTS.length} products across {STOREFRONT_ROUTES.length} categories. Organized by
+            {publicProducts().length} products across {STOREFRONT_ROUTES.length} categories. Organized by
             structural, load-bearing, or metabolic function.
           </p>
         </div>
@@ -52,7 +53,7 @@ export default function ShopPage() {
       {/* Category sections */}
       <div className="mx-auto w-full max-w-7xl px-6">
         {STOREFRONT_ROUTES.map((route) => {
-          const products = getProductsByStorefrontRoute(route.slug);
+          const products = getPublicProductsByStorefrontRoute(route.slug);
           return (
             <section
               key={route.slug}
