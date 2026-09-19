@@ -4,10 +4,10 @@ import type { Metadata } from 'next';
 import {
   STOREFRONT_ROUTES,
   getStorefrontRouteBySlug,
-  getProductsByStorefrontRoute,
   type CategorySlug,
   type StorefrontRouteSlug,
 } from '@/lib/products';
+import { getPublicProductsByStorefrontRoute } from '@/lib/catalog-withholding';
 import ProductCard from '@/components/ProductCard';
 import ReviewSection from '@/components/ReviewSection';
 import SubscriptionPanel from '@/components/SubscriptionPanel';
@@ -45,7 +45,9 @@ export default async function CategoryPage({ params }: PageProps) {
 
   if (!route) notFound();
 
-  const products = getProductsByStorefrontRoute(route.slug);
+  // Withheld (pending-consent) products are filtered here, so a catalog listing
+  // can never surface a SKU whose brand consent is not yet executed.
+  const products = getPublicProductsByStorefrontRoute(route.slug);
   const reviewCategory = reviewCategoryForRoute(route.slug);
 
   // Adjacent routes for prev/next nav
