@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Category routes stay: the withheld line is a product set, not a route. The
   // affected categories carry other inventory and remain valid destinations.
-  const routeRoutes: MetadataRoute.Sitemap = STOREFRONT_ROUTES.map((route) => ({
+  const routeRoutes: MetadataRoute.Sitemap = STOREFRONT_ROUTES.filter((route) => route.slug !== 'loop-subscription').map((route) => ({
     url: `${SITE_URL}/shop/${route.slug}`,
     changeFrequency: 'weekly',
     priority: 0.8,
