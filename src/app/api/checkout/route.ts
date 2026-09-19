@@ -2,7 +2,7 @@ import { after, NextResponse } from 'next/server';
 import { getDb } from '@/db';
 import { store_orders } from '@/db/schema';
 import { eq, gte, and, sql } from 'drizzle-orm';
-import { PRODUCTS } from '@/lib/products';
+import { publicProducts } from '@/lib/catalog-withholding';
 
 // Hard cap negotiated with merchant processor (Lane 1 mandate: $30,000 monthly volume)
 const MONTHLY_VOLUME_LIMIT = 30000;
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const productIds = new Set(PRODUCTS.map((product) => product.id));
+    const productIds = new Set(publicProducts().map((product) => product.id));
     if (cartItems.some((item) => !productIds.has(item?.id))) {
       return NextResponse.json(
         { error: 'Cart contains an unavailable product.' },
