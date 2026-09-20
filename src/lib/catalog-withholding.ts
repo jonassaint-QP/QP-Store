@@ -36,6 +36,8 @@ import {
 export const PENDING_CONSENT_STATUS =
   'WITHHELD — PENDING M.D. SCIENCE ONLINE-SELLER CONSENT AND MAP AGREEMENT' as const;
 
+export const CATALOGUE_SUSPENDED = true;
+
 /**
  * Brand-family SKU prefixes for the withheld line. Derived from
  * src/lib/sku-registry.ts, where every affected SKU is documented.
@@ -131,21 +133,27 @@ export function isWithheldProduct(product: unknown): boolean {
  * Return type is inferred from PRODUCTS, so element typing is identical to the
  * registry — consumers keep `product.slug`, `product.name` and so on unchanged.
  */
-export function publicProducts() {
-  return PRODUCTS.filter((product) => !isWithheldProduct(product));
+export function publicProducts(): typeof PRODUCTS {
+  return PRODUCTS.filter(
+    (product) => !CATALOGUE_SUSPENDED && !isWithheldProduct(product)
+  );
 }
 
 /** Public replacement for getProductBySlug. Withheld slugs resolve to undefined. */
-export function getPublicProductBySlug(slug: string) {
+export function getPublicProductBySlug(
+  slug: string
+): ReturnType<typeof getProductBySlugFromRegistry> {
   const product = getProductBySlugFromRegistry(slug);
-  if (!product || isWithheldProduct(product)) return undefined;
+  if (CATALOGUE_SUSPENDED || !product || isWithheldProduct(product)) return undefined;
   return product;
 }
 
 /** Public replacement for getProductsByStorefrontRoute. */
-export function getPublicProductsByStorefrontRoute(storefrontRouteSlug: StorefrontRouteSlug) {
+export function getPublicProductsByStorefrontRoute(
+  storefrontRouteSlug: StorefrontRouteSlug
+): ReturnType<typeof getProductsByStorefrontRouteFromRegistry> {
   return getProductsByStorefrontRouteFromRegistry(storefrontRouteSlug).filter(
-    (product) => !isWithheldProduct(product)
+    (product) => !CATALOGUE_SUSPENDED && !isWithheldProduct(product)
   );
 }
 

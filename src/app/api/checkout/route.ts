@@ -2,7 +2,7 @@ import { after, NextResponse } from 'next/server';
 import { getDb } from '@/db';
 import { store_orders } from '@/db/schema';
 import { eq, gte, and, sql } from 'drizzle-orm';
-import { publicProducts } from '@/lib/catalog-withholding';
+import { CATALOGUE_SUSPENDED, publicProducts } from '@/lib/catalog-withholding';
 
 // Hard cap negotiated with merchant processor (Lane 1 mandate: $30,000 monthly volume)
 const MONTHLY_VOLUME_LIMIT = 30000;
@@ -11,7 +11,7 @@ const WARNING_THRESHOLD = MONTHLY_VOLUME_LIMIT * 0.85; // $25,500
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { cartItems, customerInfo, shippingAddress, currency = 'USD' } = body;
+    const { cartItems, customerInfo, shippingAddress } = body;
     // Guard: customer identity is required before any pricing or persistence
     if (!customerInfo?.name || !customerInfo?.email) {
       return NextResponse.json(
@@ -28,8 +28,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const productIds = new Set(publicProducts().map((product) => product.id));
-    if (cartItems.some((item) => !productIds.has(item?.id))) {
+    if (CATALOGUE_SUSPENDED) {
+      return NextResponse.json(
+        { error: 'The storefront is temporarily closed and not accepting orders.' },
+        { status: 503 },
+      );
+    }
+
+    const publicCatalogue = new Map(
+      publicProducts().map((product) => [product.id, product] as const)
+    );
+    if (cartItems.some((item) => !publicCatalogue.has(item?.id))) {
       return NextResponse.json(
         { error: 'Cart contains an unavailable product.' },
         { status: 400 },
@@ -37,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Calculate final total server-side to prevent tampering
-    const amount = calculateTotal(cartItems, currency);
+    const amount = calculateTotal(cartItems, publicCatalogue);
     const numericAmount = parseFloat(amount);
 
     // 2. Velocity check: rolling 30-day paid volume
@@ -148,15 +157,12 @@ async function triggerAdminAlert(projectedVolume: number): Promise<void> {
 }
 
 function calculateTotal(
-  items: { price: number; quantity: number }[] | undefined,
-  currency: string,
+  items: { id: string; quantity: number }[],
+  catalogue: Map<string, ReturnType<typeof publicProducts>[number]>,
 ): string {
-  // TODO: replace with DB-backed pricing lookup to prevent price injection
-  if (!items || !Array.isArray(items)) {
-    console.warn('[Checkout Warning] calculateTotal received undefined or invalid cartItems.');
-    return '0.00';
-  }
-  const baseUSD = items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
-  // 1 USD = 1.38 CAD
-  return (currency === 'CAD' ? baseUSD * 1.38 : baseUSD).toFixed(2);
+  const totalUSD = items.reduce(
+    (sum, item) => sum + catalogue.get(item.id)!.price * (item.quantity || 1),
+    0,
+  );
+  return totalUSD.toFixed(2);
 }
