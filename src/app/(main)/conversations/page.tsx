@@ -1,9 +1,12 @@
 import { PERSONAS, getPersonaProducts } from '@/lib/personas';
 
-export const metadata = {  
-title: 'Conversations | Queer Pathways',  
-description:  
-  'Six conversations in object form. Choose a folder to meet Alex, Ken, Jasper, Marcus, Gabe, and Simon through the gear they reach for.',  
+export const metadata = {
+  title: 'Conversations | Queer Pathways',
+  description:
+    'Six conversations in object form. Choose a folder to meet Alex, Ken, Jasper, Marcus, Gabe, and Simon through the gear they reach for.',
+  // Founder's ruling 8 October: the storefront is de-indexed while it is dormant,
+  // and this route is storefront, not practice.
+  robots: { index: false, follow: false },
 };
 
 export default function ConversationsPage() {  
