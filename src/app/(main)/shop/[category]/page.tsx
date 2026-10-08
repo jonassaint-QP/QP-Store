@@ -27,7 +27,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${route.title} — Queer Pathways`,
     description: route.description,
-    robots: route.slug === 'loop-subscription' ? { index: false, follow: true } : undefined,
+    // Explicit at the page level, not inherited from the segment layout, so the
+    // de-index does not depend on how Next merges a child's metadata over a parent's.
+    // Covers all category routes, which ARE the taxonomy.
+    robots: { index: false, follow: false },
   };
 }
 
