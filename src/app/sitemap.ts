@@ -1,32 +1,17 @@
 import type { MetadataRoute } from 'next';
-import { STOREFRONT_ROUTES, getStorefrontRouteForProduct } from '@/lib/products';
-import { publicProducts } from '@/lib/catalog-withholding';
 
 const SITE_URL = 'https://queerpathways.com';
 
+// Three entries. The shop taxonomy is de-indexed, so listing it here would contradict
+// the robots directive on the /shop segment. The withheld-product and storefront-route
+// imports are gone with it: there is nothing left to disclose, and an import that
+// cannot produce a live URL is how a sitemap drifts back open.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes: MetadataRoute.Sitemap = [
-    { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
-    { url: `${SITE_URL}/shop`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${SITE_URL}/prepare`, changeFrequency: 'monthly', priority: 0.7 },
+  return [
+    { url: SITE_URL, changeFrequency: 'monthly', priority: 1 },
     { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.6 },
+    // /prepare is a live holding page, not taxonomy, so it stays. The ruling took the
+    // /shop taxonomy out of the index and nothing else.
+    { url: `${SITE_URL}/prepare`, changeFrequency: 'monthly', priority: 0.7 },
   ];
-
-  // Category routes stay: the withheld line is a product set, not a route. The
-  // affected categories carry other inventory and remain valid destinations.
-  const routeRoutes: MetadataRoute.Sitemap = STOREFRONT_ROUTES.filter((route) => route.slug !== 'loop-subscription').map((route) => ({
-    url: `${SITE_URL}/shop/${route.slug}`,
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
-
-  // Withheld products are omitted here as well as at the route level, so a
-  // pending-consent SKU cannot be discovered through the sitemap.
-  const productRoutes: MetadataRoute.Sitemap = publicProducts().map((product) => ({
-    url: `${SITE_URL}/shop/${getStorefrontRouteForProduct(product)}/${product.slug}`,
-    changeFrequency: 'weekly',
-    priority: 0.7,
-  }));
-
-  return [...staticRoutes, ...routeRoutes, ...productRoutes];
 }
